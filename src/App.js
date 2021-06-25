@@ -1,25 +1,54 @@
-import logo from './logo.svg';
-import './App.css';
+import logo from "./logo.svg";
+import "./App.css";
+import React, { useState } from "react";
 
 function App() {
+  const [item, setItem] = useState(1);
+  const incresement = () => {
+    setItem(item + 1);
+  };
+  const decresement = () => {
+    setItem(item - 1);
+  };
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div>
+        <h1>Item number is : {item}</h1>
+      </div>
+      <div>
+        <button onClick={incresement}>Increse</button>
+        <button onClick={decresement}>Decrese</button>
+      </div>
+    </>
   );
 }
 
-export default App;
+const useInput = (initValue, validator) => {
+  const [value, setValue] = useState(initValue);
+
+  const onChange = (e) => {
+    const {
+      target: { value },
+    } = e;
+    let willUpdate = true;
+		if (typeof validator === "function") {
+			willUpdate = validator(value);
+		}
+		if (willUpdate) setValue(value);
+  };
+
+  return { value, onChange };
+};
+
+const AppInput = () => {
+	const validator = (value) => !value.includes('@');
+  const name = useInput("Mr.", validator);
+  return (
+    <div>
+      <h1>Hello</h1>
+      <input placeholder="name" {...name} />
+    </div>
+  );
+};
+
+export default AppInput;
