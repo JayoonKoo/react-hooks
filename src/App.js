@@ -132,4 +132,99 @@ const AppClick = () => {
 	)
 }
 
-export default AppClick;
+const useConfirm = (message = "", onConfirm, onCancel) => {
+	if (!onConfirm || typeof onConfirm !== "function") return;
+	if (onCancel && typeof onCancel !== "function") return;
+
+	const confirmAction = () => {
+		// 브라우저의 confirm 함
+		if (window.confirm(message)) {
+			onConfirm();
+		} else {
+			onCancel();
+		}
+	}
+
+	return confirmAction;
+}
+
+const AppConfirm = () => {
+	const deleteWorld = () => console.log("delete all world!");
+	const abort = () => console.log("abort");
+	const confirmDelete = useConfirm("are you sure?", deleteWorld, abort);
+	return (
+		<div>
+			<h1>Hello</h1>
+			<button onClick={confirmDelete}>Delete World!</button>
+		</div>
+	)
+}
+
+const usePreventLeave = () => {
+	const listener = (event) => {
+		event.preventDefault();
+		event.returnValue = "";
+	}
+	const enablePrevent = () => window.addEventListener("beforeunload", listener);
+	const disablePrevent = () => window.removeEventListener("beforeunload", listener);
+
+	return { enablePrevent, disablePrevent };
+}
+
+const AppPrevent = () => {
+	const { enablePrevent, disablePrevent } = usePreventLeave();
+	return (
+		<div>
+			<h1>Hello</h1>
+			<button onClick={enablePrevent}>protect</button>
+			<button onClick={disablePrevent}>unProtect</button>
+		</div>
+	)
+}
+
+const useBeforeLeave = (onBefore) => {
+
+	const handler = event => {
+		const { clientY } = event;
+		if (clientY <= 0) onBefore();
+	}
+
+	useEffect(() => {
+		document.addEventListener("mouseleave", handler);
+		return () => {
+			document.removeEventListener("mouseleave", handler);
+		}
+	}, []);
+}
+
+const AppBefore = () => {
+	const onBefore = () => {console.log("pls don't go")};
+	useBeforeLeave(onBefore);
+	return (
+		<div>
+			<h1>Hello</h1>
+		</div>
+	)
+};
+
+const useFadeIn = () => {
+	const element = useRef();
+	useEffect(() => {
+		if (element.current) {
+			const { current } = element;
+			current.style.transition = 'opacity 3s';
+			current.style.opacity = 1;
+		}
+	}, []);
+	return {ref: element, style:{opacity:"0"}};
+}
+
+const AppFadeIn = () => {
+	const fadeInH1 = useFadeIn();
+	return (
+		<div>
+			<h1 {...fadeInH1}>Hello</h1>
+		</div>
+	)
+};
+export default AppFadeIn;
