@@ -227,4 +227,79 @@ const AppFadeIn = () => {
 		</div>
 	)
 };
-export default AppFadeIn;
+
+const useScroll = () => {
+	const [state, setState] = useState({
+		x: 0,
+		y: 0,
+	})
+
+	const onscroll = () => {
+		setState({y: window.scrollY, x: window.scrollX});
+	}
+
+	useEffect(() => {
+		window.addEventListener("scroll", onscroll);
+		return () => {
+			window.removeEventListener("scroll", onscroll);
+		}
+	}, []);
+	return state;
+}
+const AppScroll = () => {
+	const {y} = useScroll();
+	return (
+		<div style={{height: "1000vh"}}>
+			<h1 style={{ position:"fixed", color: y > 100 ? "blue": "red"}}>Hello</h1>
+		</div>
+	)
+};
+
+const useFullScreen = () => {
+	const element = useRef();
+	const triggerFull = () => {
+		if(element.current) {
+			element.current.requestFullscreen();
+		}
+	}
+	return {element, triggerFull };
+}
+const AppFullScreen = () => {
+	const {element, triggerFull } = useFullScreen();
+	return (
+		<div>
+			<img ref={element} src="https://newsimg.hankookilbo.com/cms/articlerelease/2019/04/29/201904291390027161_3.jpg"></img>
+			<button onClick={triggerFull}>request Full Screen</button>
+		</div>
+	)
+};
+
+const useNotification = (title, option) => {
+	if (!("Notification" in window)) {
+		return;
+	}
+
+	const fireNotif = () => {
+		if (Notification.permission !== "granted") {
+			Notification.requestPermission() //
+				.then(permission => {
+					if (permission === "granted") {
+						new Notification(title, option);
+					} else return;
+				})
+		} else {
+			new Notification(title, option);
+		}
+	}
+
+	return fireNotif;
+}
+const AppNotifi = () => {
+	const triggerNotif = useNotification("집에 가고 싶냐", {body: "절대 안돼지"});
+	return (
+		<div>
+			<button onClick={triggerNotif}>Hello</button>
+		</div>
+	)	
+};
+export default AppNotifi;
